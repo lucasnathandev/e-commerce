@@ -4,6 +4,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import fastifyAuth from "@fastify/auth";
 import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
+
 import { authenticate } from "./middlewares/authenticate";
 import { authorize } from "./middlewares/authorize";
 import {
@@ -11,6 +12,7 @@ import {
   serializerCompiler,
 } from "fastify-type-provider-zod";
 import { routes } from "./routes";
+import fastifyStatic from "@fastify/static";
 
 loadEnv();
 
@@ -27,12 +29,15 @@ server.setErrorHandler(
     reply.code(error.statusCode || 500).send(error);
   }
 );
-server.register(routes);
 
+server.register(fastifyStatic, {
+  root: "/public",
+  prefix: "/public-content",
+});
+server.register(routes);
 server.register(cors, {
   origin: "localhost:8081",
 });
-
 server.register(fastifyJwt, {
   secret:
     "kjkwaeisakdjawdiw93u1ks89u123kj123u123j98u1239u12ljk12390u1290812lçk12398",

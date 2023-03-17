@@ -11,18 +11,79 @@ datasource db {
 }
 
 model User {
-  id        String   @id @map("_id") @db.ObjectId
-  user      String   @unique
+  id        String    @id @map("_id") @db.ObjectId
+  user      String    @unique
   password  String
-  email     String   @unique
+  email     String    @unique
   firstName String
   lastName  String
-  rg        String   @unique
-  cpf       String   @unique
+  rg        String    @unique
+  cpf       String    @unique
   type      UserType
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id                  String   @id @map("_id") @db.ObjectId
+  description         String
+  price               Float
+  code                String   @unique
+  owner               User     @relation(fields: [userId], references: [id])
+  detailedDescription String
+  userId              String   @db.ObjectId
+  cart                Cart?    @relation(fields: [cartId], references: [id])
+  cartId              String?  @db.ObjectId
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Cart {
+  id       String    @id @map("_id") @db.ObjectId
+  products Product[]
+  discount Float     @default(0)
+  subtotal Float
+}
+
+model Delivery {
+  id                 String           @id @map("_id") @db.ObjectId
+  zipCode            String
+  country            String
+  state              String
+  city               String
+  publicPlace        String
+  provider           DeliveryProvider @relation(fields: [deliveryProviderId], references: [id])
+  deliveryProviderId String           @db.ObjectId
+}
+
+model DeliveryProvider {
+  id       String     @id @map("_id") @db.ObjectId
+  cnpj     String
+  price    Float
+  Delivery Delivery[]
+}
+
+model Checkout {
+  id              String        @id @map("_id") @db.ObjectId
+  deliveryAddress Json
+  paymentMethod   PaymentMethod
+  Order           Order[]
+}
+
+model Order {
+  id         String   @id @map("_id") @db.ObjectId
+  checkout   Checkout @relation(fields: [checkoutId], references: [id])
+  checkoutId String   @db.ObjectId
 }
 
 enum UserType {
   User
   Seller
+}
+
+enum PaymentMethod {
+  CC
+  DC
+  Other
 }
