@@ -1,9 +1,10 @@
 import { config as loadEnv } from "dotenv";
-import fastify, { FastifyError } from "fastify";
+import fastify, { FastifyInstance, FastifyError } from "fastify";
 import { FastifyRequest, FastifyReply } from "fastify";
 import fastifyAuth from "@fastify/auth";
 import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
+import fastifyZod from "fastify-zod";
 
 import { authenticate } from "./middlewares/authenticate";
 import { authorize } from "./middlewares/authorize";
@@ -11,16 +12,18 @@ import {
   validatorCompiler,
   serializerCompiler,
 } from "fastify-type-provider-zod";
-import { routes } from "./routes";
+import { routes } from "./lib/routes";
 import fastifyStatic from "@fastify/static";
 
 loadEnv();
 
-const server = fastify({
+const server: FastifyInstance = fastify({
   logger: true,
   requestTimeout: 10000,
   maxRequestsPerSocket: 5,
 });
+
+// fastifyZod.register(server)
 
 server.setValidatorCompiler(validatorCompiler);
 server.setSerializerCompiler(serializerCompiler);

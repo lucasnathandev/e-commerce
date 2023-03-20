@@ -11,70 +11,85 @@ datasource db {
 }
 
 model User {
-  id        String    @id @map("_id") @db.ObjectId
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   user      String    @unique
   password  String
   email     String    @unique
-  firstName String
-  lastName  String
-  rg        String    @unique
-  cpf       String    @unique
-  type      UserType
-  products  Product[]
+  firstName String?
+  lastName  String?
+  rg        String?   @unique
+  cpf       String?   @unique
+  type      UserType  @default(User)
+  products  Product?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  history   History[]
 }
 
 model Product {
-  id                  String   @id @map("_id") @db.ObjectId
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
   description         String
   price               Float
   code                String   @unique
   owner               User     @relation(fields: [userId], references: [id])
-  detailedDescription String
-  userId              String   @db.ObjectId
+  detailedDescription String?
+  userId              String   @unique @db.ObjectId
   cart                Cart?    @relation(fields: [cartId], references: [id])
   cartId              String?  @db.ObjectId
+  ratingStars         Int      @default(0)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
 
 model Cart {
-  id       String    @id @map("_id") @db.ObjectId
-  products Product[]
-  discount Float     @default(0)
-  subtotal Float
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  products  Product[]
+  discount  Float     @default(0)
+  total     Float
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Delivery {
-  id                 String           @id @map("_id") @db.ObjectId
+  id                 String           @id @default(auto()) @map("_id") @db.ObjectId
+  receiverName       String
   zipCode            String
   country            String
   state              String
   city               String
   publicPlace        String
-  provider           DeliveryProvider @relation(fields: [deliveryProviderId], references: [id])
-  deliveryProviderId String           @db.ObjectId
+  deliveryProvider   DeliveryProvider @relation(fields: [deliveryProviderId], references: [id])
+  deliveryProviderId String           @unique @db.ObjectId
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 }
 
 model DeliveryProvider {
-  id       String     @id @map("_id") @db.ObjectId
-  cnpj     String
-  price    Float
-  Delivery Delivery[]
-}
-
-model Checkout {
-  id              String        @id @map("_id") @db.ObjectId
-  deliveryAddress Json
-  paymentMethod   PaymentMethod
-  Order           Order[]
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  cnpj       String
+  price      Float
+  deliveries Delivery?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Order {
-  id         String   @id @map("_id") @db.ObjectId
-  checkout   Checkout @relation(fields: [checkoutId], references: [id])
-  checkoutId String   @db.ObjectId
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  status    OrderStatus @default(Pending)
+  history   History[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model History {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  action    String
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum UserType {
@@ -83,7 +98,17 @@ enum UserType {
 }
 
 enum PaymentMethod {
-  CC
-  DC
-  Other
+  Credit
+  Debit
+  PIX
+  PaymentSlip
+}
+
+enum OrderStatus {
+  Pending
+  Processing
+  Forwarded
+  Completed
+  Cancelled
+  Refunded
 }
