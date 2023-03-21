@@ -6,4 +6,4 @@ import { FastifyRequest, FastifyReply } from "fastify";
 export type ControllerType = (
   request: FastifyRequest,
   reply: FastifyReply
-) => any;
+) => typeof reply | any;

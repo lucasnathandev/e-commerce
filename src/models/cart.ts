@@ -1,7 +1,7 @@
 import { ZodArray, z } from "zod";
 import { Product } from "./product";
 
-const CartId = z.object({
+export const CartId = z.object({
   id: z.string(),
 });
 

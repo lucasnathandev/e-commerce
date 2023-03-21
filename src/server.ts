@@ -1,10 +1,10 @@
 import { config as loadEnv } from "dotenv";
-import fastify, { FastifyInstance, FastifyError } from "fastify";
+import fastify, { FastifyError } from "fastify";
 import { FastifyRequest, FastifyReply } from "fastify";
 import fastifyAuth from "@fastify/auth";
 import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
-import fastifyZod from "fastify-zod";
+import { fastifySwagger } from "@fastify/swagger";
 
 import { authenticate } from "./middlewares/authenticate";
 import { authorize } from "./middlewares/authorize";
@@ -17,13 +17,11 @@ import fastifyStatic from "@fastify/static";
 
 loadEnv();
 
-const server: FastifyInstance = fastify({
+const server = fastify({
   logger: true,
   requestTimeout: 10000,
   maxRequestsPerSocket: 5,
 });
-
-// fastifyZod.register(server)
 
 server.setValidatorCompiler(validatorCompiler);
 server.setSerializerCompiler(serializerCompiler);
@@ -37,7 +35,7 @@ server.register(fastifyStatic, {
   root: "/public",
   prefix: "/public-content",
 });
-server.register(routes);
+
 server.register(cors, {
   origin: "localhost:8081",
 });
@@ -49,12 +47,25 @@ server.register(fastifyJwt, {
   },
 });
 server.register(fastifyAuth);
+server.register(fastifySwagger, {
+  prefix: "/docs",
+  swagger: {
+    info: {
+      title: "Server Requests API Swagger",
+      description:
+        "This swagger is the documentation of the e-commerce REST API",
+      version: "0.1.0",
+    },
+  },
+});
 
 // Authentication midddleware
 server.decorate("authenticate", authenticate);
 
 // Authorization middleware
 server.decorate("authorize", authorize);
+
+server.register(routes);
 
 const port: number = Number(process.env.PORT) || 8081;
 

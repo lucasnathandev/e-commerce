@@ -2,7 +2,7 @@ import { History } from "./history";
 import { ZodArray, z } from "zod";
 import { Product } from "./product";
 
-const UserId = z.object({
+export const UserId = z.object({
   id: z.string(),
 });
 const user = z.string();
