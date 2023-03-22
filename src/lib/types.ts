@@ -7,3 +7,9 @@ export type ControllerType = (
   request: FastifyRequest,
   reply: FastifyReply
 ) => typeof reply | any;
+
+export type HistoryData = {
+  userId: string;
+  orderId?: string;
+  action: string;
+};

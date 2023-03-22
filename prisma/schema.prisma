@@ -14,6 +14,7 @@ model User {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   user      String    @unique
   password  String
+  age       Int?
   email     String    @unique
   firstName String?
   lastName  String?
@@ -21,6 +22,7 @@ model User {
   cpf       String?   @unique
   type      UserType  @default(User)
   products  Product?
+  isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   history   History[]
@@ -36,6 +38,7 @@ model Product {
   userId              String   @unique @db.ObjectId
   cart                Cart?    @relation(fields: [cartId], references: [id])
   cartId              String?  @db.ObjectId
+  isActive            Boolean  @default(true)
   ratingStars         Int      @default(0)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

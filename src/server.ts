@@ -5,7 +5,6 @@ import fastifyAuth from "@fastify/auth";
 import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
 import { fastifySwagger } from "@fastify/swagger";
-
 import { authenticate } from "./middlewares/authenticate";
 import { authorize } from "./middlewares/authorize";
 import {
@@ -37,7 +36,7 @@ server.register(fastifyStatic, {
 });
 
 server.register(cors, {
-  origin: "localhost:8081",
+  origin: "localhost:8002",
 });
 server.register(fastifyJwt, {
   secret:

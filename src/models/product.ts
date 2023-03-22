@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { User } from "./user";
-import { Cart } from "./cart";
 
 export const ProductId = z.object({
   id: z.string(),
@@ -12,7 +11,7 @@ const code = z.string();
 const owner = User;
 const detailedDescription = z.string().optional();
 const userId = z.string();
-const cart = Cart;
+const isActive = z.boolean().default(true);
 const ratingStars = z.number().min(0).max(5);
 
 export const Product = ProductId.extend({
@@ -22,5 +21,6 @@ export const Product = ProductId.extend({
   owner,
   detailedDescription,
   userId,
-  cart,
+  isActive,
+  ratingStars,
 });

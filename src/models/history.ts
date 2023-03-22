@@ -10,7 +10,7 @@ const action = z.string();
 const user: z.AnyZodObject = User;
 const userId = z.string();
 const order = Order;
-const orderId = z.string();
+const orderId = z.string().optional();
 
 export const History = HistoryId.extend({
   action,
