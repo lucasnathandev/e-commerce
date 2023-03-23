@@ -1,6 +1,9 @@
 import { config as loadEnv } from "dotenv";
 import fastify, { FastifyError } from "fastify";
 import { FastifyRequest, FastifyReply } from "fastify";
+import helmet from "@fastify/helmet";
+import middie from "@fastify/middie";
+import rateLimit from "@fastify/rate-limit";
 import fastifyAuth from "@fastify/auth";
 import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
@@ -30,13 +33,25 @@ server.setErrorHandler(
   }
 );
 
+server.register(rateLimit, {
+  max: 60,
+  global: false,
+  ban: 3,
+  cache: 10000,
+  timeWindow: "1 minute",
+  allowList: ["127.0.0.1"],
+});
+server.register(helmet);
+server.register(middie, {
+  hook: "onRequest",
+});
 server.register(fastifyStatic, {
   root: "/public",
-  prefix: "/public-content",
+  prefix: "/asswts",
 });
 
 server.register(cors, {
-  origin: "localhost:8002",
+  origin: "http://localhost:8002",
 });
 server.register(fastifyJwt, {
   secret:

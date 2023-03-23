@@ -1,3 +1,5 @@
+import { userController } from "./../../controllers/userController";
+import { authenticate } from "./../../middlewares/authenticate";
 import { userRoutes } from "./user";
 import { User } from "./../../models/user";
 

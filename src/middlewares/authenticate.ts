@@ -1,12 +1,14 @@
 import { FastifyReply, FastifyRequest } from "fastify";
+import { Handler } from "@fastify/middie";
+import { ServerResponse } from "http";
 
-export const authenticate = async (
-  request: FastifyRequest,
-  reply: FastifyReply
+export const authenticate: Handler = async (
+  request: any,
+  reply: ServerResponse
 ) => {
   try {
     await request.jwtVerify();
   } catch (err) {
-    reply.send(err);
+    reply.end(err);
   }
 };
