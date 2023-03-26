@@ -29,6 +29,7 @@
     "dotenv": "^16.0.3",
     "fastify": "^4.14.1",
     "fastify-type-provider-zod": "^1.1.9",
+    "rm": "^0.1.8",
     "zod": "^3.21.4"
   },
   "devDependencies": {

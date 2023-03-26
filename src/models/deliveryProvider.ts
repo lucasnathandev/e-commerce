@@ -2,7 +2,7 @@ import { Delivery } from "./delivery";
 import { z } from "zod";
 
 export const DeliveryProviderId = z.object({
-  id: z.string(),
+  id: z.string().optional(),
 });
 
 const cnpj = z.string().min(14, "CNPJ inválido").max(18, "CNPJ inválido");

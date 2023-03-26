@@ -3,7 +3,7 @@ import { User } from "./user";
 import { z } from "zod";
 
 export const HistoryId = z.object({
-  id: z.string(),
+  id: z.string().optional(),
 });
 
 const action = z.string();

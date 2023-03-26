@@ -2,7 +2,7 @@ import { z } from "zod";
 import { DeliveryProvider, DeliveryProviderId } from "./deliveryProvider";
 
 export const DeliveryId = z.object({
-  id: z.string(),
+  id: z.string().optional(),
 });
 
 const receiverName = z.string();

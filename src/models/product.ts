@@ -2,7 +2,7 @@ import { z } from "zod";
 import { User } from "./user";
 
 export const ProductId = z.object({
-  id: z.string(),
+  id: z.string().optional(),
 });
 
 const description = z.string();

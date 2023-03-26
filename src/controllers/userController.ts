@@ -1,17 +1,15 @@
+import {
+  UserCreationSchema,
+  UserPasswordUpdateSchema,
+  UserInactivateSchema,
+  UserId,
+} from "./../models/user";
+import bcrypt from "bcrypt";
 import { HistoryData } from "./../lib/types";
 import { HISTORY_ACTION_MESSAGES } from "./../lib/constants";
 import { createHistory } from "./../utils/historyActions";
 import { prisma } from "src/lib/prisma";
 import { ControllerType } from "src/lib/types";
-import { User } from "src/models/user";
-
-const index: ControllerType = async (request, reply) => {
-  return await prisma.user.findMany({
-    orderBy: {
-      firstName: "asc",
-    },
-  });
-};
 
 const getUsers: ControllerType = async (request, reply) => {
   return await prisma.user.findMany({
@@ -22,7 +20,8 @@ const getUsers: ControllerType = async (request, reply) => {
 };
 
 const getUser: ControllerType = async (request, reply) => {
-  const { id } = User.parse(request.body);
+  console.log("id " + request.params);
+  const { id } = UserId.parse(request.params);
 
   const userData = await prisma.user.findFirst({
     where: {
@@ -30,15 +29,21 @@ const getUser: ControllerType = async (request, reply) => {
     },
   });
 
-  return reply.status(reply.statusCode).send({ user: userData });
+  const { password, isActive, ...filteredData } = userData!;
+
+  return reply.status(reply.statusCode).send({ user: filteredData });
 };
 
 const createUser: ControllerType = async (request, reply) => {
-  const { user, password, email } = User.parse(request.body);
+  const { user, password, email } = UserCreationSchema.parse(request.body);
+
+  const salt = await bcrypt.genSalt(10);
+  const encrypted = await bcrypt.hash(password, salt);
+
   const createdUser = await prisma.user.create({
     data: {
       user,
-      password,
+      password: encrypted,
       email,
     },
   });
@@ -95,7 +100,7 @@ const updateUser: ControllerType = async (request, reply) => {
 };
 
 const updateUserPassword: ControllerType = async (request, reply) => {
-  const { password, id } = User.parse(request.body);
+  const { password, id } = UserPasswordUpdateSchema.parse(request.body);
   const updatedUser = await prisma.user.update({
     where: { id },
     data: {
@@ -119,7 +124,7 @@ const updateUserPassword: ControllerType = async (request, reply) => {
 };
 
 const inactivateUser: ControllerType = async (request, reply) => {
-  const { id } = User.parse(request.body);
+  const { id } = UserInactivateSchema.parse(request.body);
 
   const inactivatedUser = await prisma.user.update({
     where: {
@@ -147,12 +152,41 @@ const inactivateUser: ControllerType = async (request, reply) => {
     .send({ message: "Usuário inativado com sucesso" });
 };
 
+const activateUser: ControllerType = async (request, reply) => {
+  const { id } = UserInactivateSchema.parse(request.body);
+
+  const activatedUser = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      isActive: true,
+    },
+  });
+
+  const historyData: HistoryData = {
+    userId: activatedUser.id,
+    orderId: "",
+    action:
+      HISTORY_ACTION_MESSAGES.USER_ACTIVATED +
+      activatedUser.id +
+      HISTORY_ACTION_MESSAGES.TIMESTAMP +
+      activatedUser.updatedAt,
+  };
+
+  createHistory(historyData);
+
+  return reply
+    .status(reply.statusCode)
+    .send({ message: "Usuário ativado com sucesso" });
+};
+
 export const userController = {
-  index,
   getUsers,
   getUser,
   createUser,
   updateUser,
   updateUserPassword,
   inactivateUser,
+  activateUser,
 };

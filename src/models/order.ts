@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const OrderId = z.object({
-  id: z.string(),
+  id: z.string().optional(),
 });
 
 const status = z

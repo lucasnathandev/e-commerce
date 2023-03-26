@@ -2,14 +2,13 @@ import { config as loadEnv } from "dotenv";
 import fastify, { FastifyError } from "fastify";
 import { FastifyRequest, FastifyReply } from "fastify";
 import helmet from "@fastify/helmet";
-import middie from "@fastify/middie";
 import rateLimit from "@fastify/rate-limit";
 import fastifyAuth from "@fastify/auth";
 import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
 import { fastifySwagger } from "@fastify/swagger";
-import { authenticate } from "./middlewares/authenticate";
-import { authorize } from "./middlewares/authorize";
+import { authenticate } from "./decorators/authenticate";
+import { authorize } from "./decorators/authorize";
 import {
   validatorCompiler,
   serializerCompiler,
@@ -29,7 +28,7 @@ server.setValidatorCompiler(validatorCompiler);
 server.setSerializerCompiler(serializerCompiler);
 server.setErrorHandler(
   (error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
-    reply.code(error.statusCode || 500).send(error);
+    reply.code(error.statusCode || 500).send(error.message);
   }
 );
 
@@ -42,12 +41,9 @@ server.register(rateLimit, {
   allowList: ["127.0.0.1"],
 });
 server.register(helmet);
-server.register(middie, {
-  hook: "onRequest",
-});
 server.register(fastifyStatic, {
   root: "/public",
-  prefix: "/asswts",
+  prefix: "/assets",
 });
 
 server.register(cors, {
@@ -74,10 +70,11 @@ server.register(fastifySwagger, {
 });
 
 // Authentication midddleware
-server.decorate("authenticate", authenticate);
+// server.decorate("authenticate", authenticate);
 
 // Authorization middleware
 server.decorate("authorize", authorize);
+server.decorate("authenticate", authenticate);
 
 server.register(routes);
 
