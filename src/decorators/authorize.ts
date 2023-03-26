@@ -6,7 +6,7 @@ export const authorize = async (
 ) => {
   try {
     const token = await request.jwtVerify();
-    if (token.isAdmin) {
+    if (token.user.isAdmin) {
       return true;
     }
   } catch (err) {
