@@ -14,13 +14,9 @@ const signIn: ControllerType = async (
     const foundUser = await prisma.user.findFirst({
       where: {
         user,
+        isActive: true,
       },
     });
-
-    if (!foundUser?.isActive) {
-      return reply.status(401).send(new Error("Credenciais inválidas."));
-      // Enviar e-mail para o usuário perguntando se ele quer se reativar no sistema
-    }
 
     const isAdmin = await prisma.admin.findFirst({
       where: { userId: foundUser?.id },

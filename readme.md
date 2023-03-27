@@ -10,8 +10,8 @@
 [x] Installed back-end lib dependencies and frameworks.
 [x] Setup fastify server with basic adjustments and initial boilerplate.
 [x] Starting to setup database models using Prisma.
-[ ] Starting to code user API.
-[ ] Starting to code product API.
+[x] Starting to code user API.
+[x] Starting to code product API.
 [ ] Starting to code cart API.
 [ ] Starting to code checkout API.
 [ ] Starting to code delivery API. 

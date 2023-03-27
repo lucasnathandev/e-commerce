@@ -5,10 +5,8 @@ export const authenticate = async (
   reply: FastifyReply
 ) => {
   try {
-    console.log(this);
-
     await request.jwtVerify();
   } catch (err: any) {
-    reply.send(err);
+    reply.send(error);
   }
 };

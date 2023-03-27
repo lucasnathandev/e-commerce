@@ -32,7 +32,12 @@ export const UserUpdateSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   email: z.string().optional(),
-  age: z.string().optional(),
+  age: z.number().optional(),
+});
+
+export const UserUpdateType = z.object({
+  id: z.string(),
+  type: z.enum(["User", "Seller"]),
 });
 
 export const UserPasswordUpdateSchema = z.object({
