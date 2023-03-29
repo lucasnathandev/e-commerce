@@ -35,7 +35,7 @@ export const UserUpdateSchema = z.object({
   age: z.number().optional(),
 });
 
-export const UserUpdateType = z.object({
+export const UserUpdateTypeSchema = z.object({
   id: z.string(),
   type: z.enum(["User", "Seller"]),
 });
@@ -43,8 +43,4 @@ export const UserUpdateType = z.object({
 export const UserPasswordUpdateSchema = z.object({
   id: z.string(),
   password,
-});
-
-export const UserInactivateSchema = z.object({
-  id: z.string(),
 });

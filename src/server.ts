@@ -20,7 +20,7 @@ loadEnv();
 const server = fastify({
   logger: true,
   requestTimeout: 10000,
-  maxRequestsPerSocket: 5,
+  bodyLimit: 1048576 * 5,
 });
 
 server.setValidatorCompiler(validatorCompiler);
@@ -39,7 +39,10 @@ server.register(rateLimit, {
   timeWindow: "1 minute",
   allowList: ["127.0.0.1"],
 });
-server.register(helmet);
+server.register(helmet, {
+  xssFilter: true,
+  noSniff: true,
+});
 
 server.register(cors, {
   origin: "http://localhost:8002",
@@ -52,25 +55,12 @@ server.register(fastifyJwt, {
   },
 });
 server.register(fastifyAuth);
-server.register(fastifySwagger, {
-  prefix: "/docs",
-  swagger: {
-    info: {
-      title: "Server Requests API Swagger",
-      description:
-        "This swagger is the documentation of the e-commerce REST API",
-      version: "0.1.0",
-    },
-  },
-});
 
 // Authentication midddleware
-// server.decorate("authenticate", authenticate);
+server.decorate("authenticate", authenticate);
 
 // Authorization middleware
 server.decorate("authorize", authorize);
-server.decorate("authenticate", authenticate);
-
 server.register(routes);
 
 const port: number = Number(process.env.PORT) || 8081;

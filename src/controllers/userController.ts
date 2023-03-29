@@ -1,10 +1,9 @@
 import {
   UserCreationSchema,
   UserPasswordUpdateSchema,
-  UserInactivateSchema,
   UserId,
   UserUpdateSchema,
-  UserUpdateType,
+  UserUpdateTypeSchema,
 } from "./../models/user";
 import bcrypt from "bcrypt";
 import { HistoryData } from "./../lib/types";
@@ -143,7 +142,7 @@ const updateUserPassword: ControllerType = async (request, reply) => {
 };
 
 const updateUserType: ControllerType = async (request, reply) => {
-  const { id, type } = UserUpdateType.parse(request.body);
+  const { id, type } = UserUpdateTypeSchema.parse(request.body);
   try {
     const updatedUser = await prisma.user.update({
       where: { id },
@@ -175,7 +174,7 @@ const updateUserType: ControllerType = async (request, reply) => {
 };
 
 const inactivateUser: ControllerType = async (request, reply) => {
-  const { id } = UserInactivateSchema.parse(request.body);
+  const { id } = UserId.parse(request.body);
   try {
     const inactivatedUser = await prisma.user.update({
       where: {
@@ -208,7 +207,7 @@ const inactivateUser: ControllerType = async (request, reply) => {
 };
 
 const activateUser: ControllerType = async (request, reply) => {
-  const { id } = UserInactivateSchema.parse(request.body);
+  const { id } = UserId.parse(request.body);
   try {
     const activatedUser = await prisma.user.update({
       where: {

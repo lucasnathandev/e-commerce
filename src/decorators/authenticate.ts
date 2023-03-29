@@ -6,7 +6,7 @@ export const authenticate = async (
 ) => {
   try {
     await request.jwtVerify();
-  } catch (err: any) {
+  } catch (error) {
     reply.send(error);
   }
 };
