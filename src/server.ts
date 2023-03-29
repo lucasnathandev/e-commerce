@@ -14,7 +14,6 @@ import {
   serializerCompiler,
 } from "fastify-type-provider-zod";
 import { routes } from "./lib/routes";
-import fastifyStatic from "@fastify/static";
 
 loadEnv();
 
@@ -41,10 +40,6 @@ server.register(rateLimit, {
   allowList: ["127.0.0.1"],
 });
 server.register(helmet);
-server.register(fastifyStatic, {
-  root: "/public",
-  prefix: "/assets",
-});
 
 server.register(cors, {
   origin: "http://localhost:8002",
