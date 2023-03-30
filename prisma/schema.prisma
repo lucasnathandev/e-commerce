@@ -12,14 +12,14 @@ datasource db {
 
 model User {
   id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  user      String       @unique
+  user      String
   password  String
   age       Int?
-  email     String       @unique
+  email     String
   firstName String?
   lastName  String?
-  rg        String?      @unique
-  cpf       String?      @unique
+  rg        String?
+  cpf       String?
   type      UserTypeEnum @default(User)
   products  Product?
   isActive  Boolean      @default(true)
@@ -28,6 +28,8 @@ model User {
   history   History[]
   Admin     Admin[]
   Cart      Cart[]
+
+  @@unique([email, user, rg, cpf])
 }
 
 model Admin {

@@ -59,6 +59,28 @@ const createUser: ControllerType = async (request, reply) => {
     const salt = await bcrypt.genSalt(10);
     const encrypted = await bcrypt.hash(password, salt);
 
+    const userAlreadyExists = await prisma.user.findFirst({
+      where: {
+        user,
+      },
+    });
+
+    const emailAlreadyTaken = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (userAlreadyExists) {
+      return reply.status(403).send(new Error("Nome de usuário indisponível."));
+    }
+
+    if (emailAlreadyTaken) {
+      return reply
+        .status(403)
+        .send(new Error("Não foi possível criar o usuário neste e-mail."));
+    }
+
     const createdUser = await prisma.user.create({
       data: {
         user,
@@ -90,6 +112,19 @@ const updateUser: ControllerType = async (request, reply) => {
   const { id, ...userData } = UserUpdateSchema.parse(request.body);
   try {
     const { firstName, lastName, email, age } = userData;
+
+    const emailAlreadyTaken = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (emailAlreadyTaken) {
+      return reply
+        .status(403)
+        .send(new Error("Não foi possível criar o usuário neste e-mail."));
+    }
+
     const updatedUser = await prisma.user.update({
       where: {
         id,
