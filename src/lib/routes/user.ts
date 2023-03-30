@@ -2,8 +2,8 @@ import { userController } from "./../../controllers/userController";
 import { FastifyInstance } from "fastify";
 
 export const userRoutes = async function (app: FastifyInstance) {
-  const isAdmin = { onRequest: [app.authenticate, app.authorize] };
-  const isAuthenticated = { onRequest: [app.authenticate] };
+  const isAdmin = { preValidation: [app.authenticate, app.authorize] };
+  const isAuthenticated = { preValidation: [app.authenticate] };
   app.get("/user/:id", isAuthenticated, userController.getUser);
   app.get("/user/list", isAdmin, userController.getUsers);
   app.post("/user/create", isAdmin, userController.createUser);

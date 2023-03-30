@@ -5,8 +5,8 @@ import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
 import fastifyAuth from "@fastify/auth";
 import fastifyJwt from "@fastify/jwt";
+
 import cors from "@fastify/cors";
-import { fastifySwagger } from "@fastify/swagger";
 import { authenticate } from "./decorators/authenticate";
 import { authorize } from "./decorators/authorize";
 import {
@@ -49,7 +49,7 @@ server.register(cors, {
 });
 server.register(fastifyJwt, {
   secret:
-    "kjkwaeisakdjawdiw93u1ks89u123kj123u123j98u1239u12ljk12390u1290812lçk12398",
+    process.env.JWT_SECRET || ".aslieoiqw90123oiopOIOPiudopI912-09-123liasd]~]",
   sign: {
     expiresIn: "1d",
   },

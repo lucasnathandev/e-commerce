@@ -1,20 +1,20 @@
 import { z } from "zod";
 
+enum OrderStatusEnum {
+  "Pending",
+  "Processing",
+  "Forwarded",
+  "Completed",
+  "Cancelled",
+  "Refunded",
+}
+
 export const OrderId = z.object({
   id: z.string().optional(),
 });
 
-const status = z
-  .enum([
-    "Pending",
-    "Processing",
-    "Forwarded",
-    "Completed",
-    "Cancelled",
-    "Refunded",
-  ])
-  .default("Pending");
+const status = z.nativeEnum(OrderStatusEnum).default(OrderStatusEnum.Pending);
 
-export const Order = OrderId.extend({
+export const OrderSchema = OrderId.extend({
   status,
 });

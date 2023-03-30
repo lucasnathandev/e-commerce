@@ -13,17 +13,31 @@ import { prisma } from "src/lib/prisma";
 import { ControllerType } from "src/lib/types";
 
 const getUsers: ControllerType = async (request, reply) => {
-  return await prisma.user.findMany({
-    orderBy: {
-      firstName: "asc",
-    },
-  });
+  try {
+    return await prisma.user.findMany({
+      orderBy: {
+        firstName: "asc",
+      },
+      select: {
+        id: true,
+        user: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        age: true,
+        rg: true,
+        cpf: true,
+        type: true,
+      },
+    });
+  } catch (error) {
+    reply.send(error);
+  }
 };
 
 const getUser: ControllerType = async (request, reply) => {
   try {
     const { id } = UserId.parse(request.params);
-
     const userData = await prisma.user.findFirst({
       where: {
         id,
@@ -32,7 +46,7 @@ const getUser: ControllerType = async (request, reply) => {
 
     const { password, isActive, ...filteredData } = userData!;
 
-    return reply.status(reply.statusCode).send({ user: filteredData });
+    return reply.status(200).send({ user: filteredData });
   } catch (error) {
     return reply.send(error);
   }
@@ -40,6 +54,7 @@ const getUser: ControllerType = async (request, reply) => {
 
 const createUser: ControllerType = async (request, reply) => {
   const { user, password, email } = UserCreationSchema.parse(request.body);
+
   try {
     const salt = await bcrypt.genSalt(10);
     const encrypted = await bcrypt.hash(password, salt);
@@ -63,11 +78,9 @@ const createUser: ControllerType = async (request, reply) => {
         createdUser.createdAt,
     };
 
-    createHistory(historyData);
+    await createHistory(historyData);
 
-    return reply
-      .status(reply.statusCode)
-      .send({ message: "Conta criada com sucesso!" });
+    return reply.status(201).send({ message: "Conta criada com sucesso!" });
   } catch (error) {
     return reply.send(error);
   }
@@ -100,9 +113,9 @@ const updateUser: ControllerType = async (request, reply) => {
         updatedUser.updatedAt,
     };
 
-    createHistory(historyData);
+    await createHistory(historyData);
 
-    return reply.status(reply.statusCode).send({
+    return reply.status(200).send({
       message: "Perfil atualizado.",
     });
   } catch (error) {
@@ -131,11 +144,9 @@ const updateUserPassword: ControllerType = async (request, reply) => {
         updatedUser.updatedAt,
     };
 
-    createHistory(historyData);
+    await createHistory(historyData);
 
-    return reply
-      .status(reply.statusCode)
-      .send({ message: "Senha atualizada." });
+    return reply.status(200).send({ message: "Senha atualizada." });
   } catch (error) {
     return reply.send(error);
   }
@@ -162,12 +173,12 @@ const updateUserType: ControllerType = async (request, reply) => {
         updatedUser.updatedAt,
     };
 
-    createHistory(historyData);
+    await createHistory(historyData);
     const message: string =
       type === "Seller"
         ? "Usuário foi alterado para vendedor."
         : "Vendedor foi alterado para usuário.";
-    return reply.status(reply.statusCode).send({ message });
+    return reply.status(200).send({ message });
   } catch (error) {
     return reply.send(error);
   }
@@ -196,11 +207,9 @@ const inactivateUser: ControllerType = async (request, reply) => {
         inactivatedUser.updatedAt,
     };
 
-    createHistory(historyData);
+    await createHistory(historyData);
 
-    return reply
-      .status(reply.statusCode)
-      .send({ message: "Usuário inativado com sucesso" });
+    return reply.status(200).send({ message: "Usuário inativado com sucesso" });
   } catch (error) {
     return reply.send(error);
   }
@@ -229,11 +238,9 @@ const activateUser: ControllerType = async (request, reply) => {
         activatedUser.updatedAt,
     };
 
-    createHistory(historyData);
+    await createHistory(historyData);
 
-    return reply
-      .status(reply.statusCode)
-      .send({ message: "Usuário ativado com sucesso" });
+    return reply.status(200).send({ message: "Usuário ativado com sucesso" });
   } catch (error) {
     return reply.send(error);
   }

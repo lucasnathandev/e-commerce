@@ -27,6 +27,7 @@
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "fastify": "^4.14.1",
+    "fastify-plugin": "^4.5.0",
     "fastify-type-provider-zod": "^1.1.9",
     "rm": "^0.1.8",
     "zod": "^3.21.4"

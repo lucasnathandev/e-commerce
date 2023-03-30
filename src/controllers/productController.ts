@@ -16,7 +16,7 @@ const getProducts: ControllerType = async (request, reply) => {
       },
     });
 
-    return reply.status(reply.statusCode).send(products);
+    return reply.status(200).send(products);
   } catch (error) {
     reply.send(error);
   }
@@ -31,7 +31,7 @@ const getProduct: ControllerType = async (request, reply) => {
         id,
       },
     });
-    return reply.status(reply.statusCode).send(product);
+    return reply.status(200).send(product);
   } catch (error) {
     reply.send(error);
   }
@@ -69,9 +69,7 @@ const createProduct: ControllerType = async (request, reply) => {
       },
     });
 
-    return reply
-      .status(reply.statusCode)
-      .send({ message: "Produto cadastrado." });
+    return reply.status(201).send({ message: "Produto cadastrado." });
   } catch (error) {
     reply.send(error);
   }
@@ -96,7 +94,7 @@ const updateProduct: ControllerType = async (request, reply) => {
       },
     });
 
-    reply.status(reply.statusCode).send({ message: "Produto atualizado." });
+    reply.status(200).send({ message: "Produto atualizado." });
   } catch (error) {
     reply.send(error);
   }

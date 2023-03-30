@@ -1,17 +1,38 @@
-import { User, UserId } from "./user";
-import { Product, ProductId } from "./product";
-import { Cart, CartId } from "./cart";
-import { Order, OrderId } from "./order";
+import {
+  UserCreationSchema,
+  UserLoginSchema,
+  UserPasswordUpdateSchema,
+  UserUpdateSchema,
+  UserUpdateTypeSchema,
+  UserId,
+} from "./user";
+import {
+  ProductSchema,
+  CreateProductSchema,
+  UpdateProductSchema,
+  ProductUserIdSchema,
+  ProductId,
+} from "./product";
+import { CartSchema, CartId, UpdateCartSchema } from "./cart";
+import { OrderSchema, OrderId } from "./order";
 import { History, HistoryId } from "./history";
 
 export const models = {
-  User,
   UserId,
-  Product,
+  UserCreationSchema,
+  UserLoginSchema,
+  UserPasswordUpdateSchema,
+  UserUpdateSchema,
+  UserUpdateTypeSchema,
   ProductId,
-  Cart,
+  ProductSchema,
+  ProductUserIdSchema,
+  CreateProductSchema,
+  UpdateProductSchema,
+  CartSchema,
   CartId,
-  Order,
+  UpdateCartSchema,
+  OrderSchema,
   OrderId,
   History,
   HistoryId,

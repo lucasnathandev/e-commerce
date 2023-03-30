@@ -5,7 +5,7 @@ export const UserId = z.object({
 });
 const user = z.string();
 const password = z.string();
-const email = z.string();
+const email = z.string().email();
 const firstName = z.string().optional();
 const lastName = z.string().optional();
 const rg = z.string().optional();

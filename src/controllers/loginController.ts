@@ -1,19 +1,15 @@
+import {
+  ActiveUserSession,
+  activeSessions,
+  checkSession,
+  createSession,
+} from "./utils/session";
 import { UserLoginSchema } from "./../models/user";
 import { prisma } from "src/lib/prisma";
 import { FastifyReply } from "fastify";
 import { FastifyRequest } from "fastify";
 import { ControllerType } from "./../lib/types";
 import bcrypt from "bcrypt";
-
-type ActiveUserSession = {
-  user: {
-    id: string;
-    isAdmin: boolean;
-  };
-  ip: string;
-};
-
-const activeSessions: ActiveUserSession[] = [];
 
 const signIn: ControllerType = async (
   request: FastifyRequest,
@@ -29,56 +25,27 @@ const signIn: ControllerType = async (
       },
     });
 
+    if (!foundUser) {
+      return reply.status(401).send(new Error("Credenciais inválidas"));
+    }
+
     const isAdmin = await prisma.admin.findFirst({
       where: { userId: foundUser?.id },
     });
 
     await bcrypt.compare(password, foundUser?.password!);
 
-    const signedInUser = {
+    const signedInUser: ActiveUserSession = {
       user: {
-        id: foundUser?.id!,
+        id: foundUser?.id,
         isAdmin: !!isAdmin,
-        ip: request.ip,
+        lastActive: Date.now(),
       },
+      ip: request.ip,
     };
 
-    const token = await reply.jwtSign(signedInUser);
-
-    const isSignedIn = !!activeSessions.find(async (session) => {
-      const suspectTryingToInvadeAccount =
-        session.user.id === signedInUser?.user.id &&
-        session.ip !== signedInUser.user.ip;
-
-      if (suspectTryingToInvadeAccount) {
-        const userEmail = await prisma.user.findFirst({
-          where: {
-            id: session.user.id,
-          },
-          select: {
-            email: true,
-          },
-        });
-        console.log("Send e-mail for account user");
-        // Email service here
-        return reply.status(401).send(new Error("Credenciais inválidas."));
-      }
-
-      return (
-        session.user.id === signedInUser?.user.id &&
-        session.ip === signedInUser.user.ip
-      );
-    });
-
-    if (!isSignedIn) {
-      activeSessions.push({
-        user: {
-          id: signedInUser.user.id,
-          isAdmin: signedInUser.user.isAdmin,
-        },
-        ip: signedInUser.user.ip,
-      });
-    }
+    const token = await reply.jwtSign({ user: signedInUser.user });
+    checkSession(signedInUser).then((session) => createSession(session));
 
     return reply.status(200).send(token);
   } catch (error) {
@@ -93,8 +60,6 @@ const signIn: ControllerType = async (
 };
 
 const signOut: ControllerType = async (request, reply) => {
-  console.log(activeSessions);
-
   try {
     const { user } = await request.jwtVerify();
 

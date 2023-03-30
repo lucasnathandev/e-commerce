@@ -5,12 +5,15 @@ import { prisma } from "src/lib/prisma";
 
 export const createHistory = async (data: HistoryData) => {
   const { action, orderId, userId } = History.parse(data);
-
-  await prisma.history.create({
-    data: {
-      action,
-      orderId,
-      userId,
-    },
-  });
+  try {
+    await prisma.history.create({
+      data: {
+        action,
+        orderId,
+        userId,
+      },
+    });
+  } catch (error) {
+    return error;
+  }
 };

@@ -11,22 +11,23 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  user      String    @unique
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  user      String       @unique
   password  String
   age       Int?
-  email     String    @unique
+  email     String       @unique
   firstName String?
   lastName  String?
-  rg        String?   @unique
-  cpf       String?   @unique
-  type      UserType  @default(User)
+  rg        String?      @unique
+  cpf       String?      @unique
+  type      UserTypeEnum @default(User)
   products  Product?
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   history   History[]
   Admin     Admin[]
+  Cart      Cart[]
 }
 
 model Admin {
@@ -44,7 +45,7 @@ model Product {
   detailedDescription String?
   userId              String   @unique @db.ObjectId
   cart                Cart?    @relation(fields: [cartId], references: [id])
-  cartId              String?  @db.ObjectId
+  cartId              String?  @unique @db.ObjectId
   isActive            Boolean  @default(true)
   ratingStars         Int      @default(0)
   createdAt           DateTime @default(now())
@@ -52,12 +53,24 @@ model Product {
 }
 
 model Cart {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  products  Product[]
-  discount  Float     @default(0)
-  total     Float
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String            @id @default(auto()) @map("_id") @db.ObjectId
+  products      Product[]
+  discount      Float             @default(0)
+  total         Float
+  paymentMethod PaymentMethodEnum @default(Credit)
+  user          User              @relation(fields: [userId], references: [id])
+  userId        String            @unique @db.ObjectId
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model Order {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  status    OrderStatusEnum @default(Pending)
+  history   History[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  delivery  Delivery[]
 }
 
 model Delivery {
@@ -68,6 +81,8 @@ model Delivery {
   state              String
   city               String
   publicPlace        String
+  order              Order            @relation(fields: [orderId], references: [id])
+  orderId            String           @db.ObjectId
   deliveryProvider   DeliveryProvider @relation(fields: [deliveryProviderId], references: [id])
   deliveryProviderId String           @unique @db.ObjectId
   createdAt          DateTime         @default(now())
@@ -83,14 +98,6 @@ model DeliveryProvider {
   updatedAt  DateTime  @updatedAt
 }
 
-model Order {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
-  status    OrderStatus @default(Pending)
-  history   History[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-}
-
 model History {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   action    String
@@ -102,19 +109,19 @@ model History {
   updatedAt DateTime @updatedAt
 }
 
-enum UserType {
+enum UserTypeEnum {
   User
   Seller
 }
 
-enum PaymentMethod {
+enum PaymentMethodEnum {
   Credit
   Debit
   PIX
   PaymentSlip
 }
 
-enum OrderStatus {
+enum OrderStatusEnum {
   Pending
   Processing
   Forwarded

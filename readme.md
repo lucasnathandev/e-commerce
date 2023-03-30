@@ -10,12 +10,15 @@
 - [x] Installed back-end lib dependencies and frameworks.
 - [x] Setup fastify server with basic adjustments and initial boilerplate.
 - [x] Starting to setup database models using Prisma.
-- [x] Starting to code user API.
-- [x] Starting to code product API.
-- [ ] Starting to code cart API.
-- [ ] Starting to code checkout API.
-- [ ] Starting to code delivery API. 
-- [ ] Starting to code payment API.
+- [x] Starting to create user API.
+- [x] Starting to create product API.
+- [ ] Starting to create cart API.
+- [ ] Starting to create checkout API.
+- [ ] Starting to create delivery API. 
+- [ ] Starting to create payment API.
+- [x] Starting to create e-mail service.
+- [ ] Starting to create payment service.
+- [ ] Starting to create delivery service.
 - [ ] Finished user API.
 - [ ] Finished cart API.
 - [ ] Finished checkout API.
