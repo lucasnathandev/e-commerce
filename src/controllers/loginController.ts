@@ -3,7 +3,7 @@ import {
   activeSessions,
   checkSession,
   createSession,
-} from "./utils/session";
+} from "./lib/session";
 import { UserLoginSchema } from "./../models/user";
 import { prisma } from "src/lib/prisma";
 import { FastifyReply } from "fastify";
