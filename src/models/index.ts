@@ -11,6 +11,7 @@ import {
   CreateProductSchema,
   UpdateProductSchema,
   ProductUserIdSchema,
+  ProductSearchSchema,
   ProductId,
 } from "./product";
 import { CartSchema, CartId, UpdateCartSchema } from "./cart";
@@ -26,14 +27,15 @@ export const models = {
   UserUpdateTypeSchema,
   ProductId,
   ProductSchema,
+  ProductSearchSchema,
   ProductUserIdSchema,
   CreateProductSchema,
   UpdateProductSchema,
-  CartSchema,
   CartId,
+  CartSchema,
   UpdateCartSchema,
-  OrderSchema,
   OrderId,
+  OrderSchema,
   History,
   HistoryId,
 };

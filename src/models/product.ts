@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const ProductId = z.object({
-  id: z.string().optional(),
+  id: z.string(),
 });
 
 const description = z.string();
@@ -20,6 +20,11 @@ export const ProductSchema = z.object({
   userId,
   isActive,
   ratingStars,
+});
+
+export const ProductSearchSchema = z.object({
+  id: z.string(),
+  code: code.optional(),
 });
 
 export const ProductUserIdSchema = z.object({

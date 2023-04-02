@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const UserId = z.object({
-  id: z.string().optional(),
+  id: z.string(),
 });
 const user = z.string();
 const password = z.string();

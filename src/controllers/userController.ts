@@ -12,7 +12,7 @@ import { createHistory } from "./../utils/historyActions";
 import { prisma } from "src/lib/prisma";
 import { ControllerType } from "src/lib/types";
 
-const getUsers: ControllerType = async (request, reply) => {
+const getUsers: ControllerType = async function (request, reply) {
   try {
     return await prisma.user.findMany({
       orderBy: {
@@ -35,7 +35,7 @@ const getUsers: ControllerType = async (request, reply) => {
   }
 };
 
-const getUser: ControllerType = async (request, reply) => {
+const getUser: ControllerType = async function (request, reply) {
   try {
     const { id } = UserId.parse(request.params);
     const userData = await prisma.user.findFirst({
@@ -52,7 +52,7 @@ const getUser: ControllerType = async (request, reply) => {
   }
 };
 
-const createUser: ControllerType = async (request, reply) => {
+const createUser: ControllerType = async function (request, reply) {
   const { user, password, email } = UserCreationSchema.parse(request.body);
 
   try {
@@ -108,7 +108,7 @@ const createUser: ControllerType = async (request, reply) => {
   }
 };
 
-const updateUser: ControllerType = async (request, reply) => {
+const updateUser: ControllerType = async function (request, reply) {
   const { id, ...userData } = UserUpdateSchema.parse(request.body);
   try {
     const { firstName, lastName, email, age } = userData;
@@ -158,13 +158,17 @@ const updateUser: ControllerType = async (request, reply) => {
   }
 };
 
-const updateUserPassword: ControllerType = async (request, reply) => {
+const updateUserPassword: ControllerType = async function (request, reply) {
   const { password, id } = UserPasswordUpdateSchema.parse(request.body);
+
+  const salt = await bcrypt.genSalt();
+  const encrypted = await bcrypt.hash(password, salt);
+
   try {
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
-        password,
+        password: encrypted,
       },
     });
 
@@ -187,7 +191,7 @@ const updateUserPassword: ControllerType = async (request, reply) => {
   }
 };
 
-const updateUserType: ControllerType = async (request, reply) => {
+const updateUserType: ControllerType = async function (request, reply) {
   const { id, type } = UserUpdateTypeSchema.parse(request.body);
   try {
     const updatedUser = await prisma.user.update({
@@ -219,7 +223,7 @@ const updateUserType: ControllerType = async (request, reply) => {
   }
 };
 
-const inactivateUser: ControllerType = async (request, reply) => {
+const inactivateUser: ControllerType = async function (request, reply) {
   const { id } = UserId.parse(request.body);
   try {
     const inactivatedUser = await prisma.user.update({
@@ -250,7 +254,7 @@ const inactivateUser: ControllerType = async (request, reply) => {
   }
 };
 
-const activateUser: ControllerType = async (request, reply) => {
+const activateUser: ControllerType = async function (request, reply) {
   const { id } = UserId.parse(request.body);
   try {
     const activatedUser = await prisma.user.update({

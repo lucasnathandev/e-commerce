@@ -17,10 +17,27 @@ export const createSession = function (session: ActiveUserSession) {
 };
 
 export const checkSession = async function (session: ActiveUserSession) {
-  const isSignedIn = !!activeSessions.find(async (s) => {
-    const suspectTryingToInvadeAccount =
-      s.user.id === session?.user.id && s.ip !== session.ip;
+  const activeSession = activeSessions.find((s) => {
+    s.user.id === session.user.id;
+  })!;
 
+  const activeSessionIndex = activeSessions.findIndex((s) => {
+    s.user.id === session.user.id;
+  })!;
+
+  if (!activeSession) {
+    return session;
+  }
+
+  const tenMinutes = 10 * 60 * 1000;
+
+  const isUserInactiveOverTenMinutes: boolean =
+    activeSession.user.lastActive <= session.user.lastActive - tenMinutes;
+
+  const suspectTryingToInvadeAccount =
+    activeSession.ip !== session.ip && !isUserInactiveOverTenMinutes;
+
+  try {
     if (suspectTryingToInvadeAccount) {
       const user = await prisma.user.findFirst({
         where: {
@@ -31,15 +48,28 @@ export const checkSession = async function (session: ActiveUserSession) {
         },
       });
       // Email service here
-      await sendAccountInvadeWarning(user?.email!);
-      return true;
+      user?.email &&
+        (await sendAccountInvadeWarning(
+          user.email,
+          { text: "Tentaram invadir sua conta" },
+          "123456"
+        ));
     }
 
-    return s.user.id === session?.user.id && s.ip === session.ip;
-  });
+    if (
+      activeSession.ip === session.ip &&
+      session.user.lastActive > activeSession.user.lastActive
+    ) {
+      activeSessions[activeSessionIndex].user.lastActive =
+        session.user.lastActive;
+    }
 
-  if (!isSignedIn) {
-    activeSessions.push(session);
+    activeSession.user.lastActive = Date.now();
+    return session;
+  } catch (error) {
+    return {
+      error: new Error("erro" + error),
+      message: "Cannot find user in database",
+    };
   }
-  return session;
 };

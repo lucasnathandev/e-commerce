@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-enum OrderStatusEnum {
+export enum OrderStatusEnum {
   "Pending",
   "Processing",
   "Forwarded",

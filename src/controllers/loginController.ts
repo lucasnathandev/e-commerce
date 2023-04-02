@@ -33,7 +33,14 @@ const signIn: ControllerType = async (
       where: { userId: foundUser?.id },
     });
 
-    await bcrypt.compare(password, foundUser?.password!);
+    const passwordMatched: boolean = await bcrypt.compare(
+      password,
+      foundUser?.password!
+    );
+
+    if (!passwordMatched) {
+      return reply.status(401).send(new Error("Credenciais inválidas."));
+    }
 
     const signedInUser: ActiveUserSession = {
       user: {
@@ -45,7 +52,14 @@ const signIn: ControllerType = async (
     };
 
     const token = await reply.jwtSign({ user: signedInUser.user });
-    checkSession(signedInUser).then((session) => createSession(session));
+    checkSession(signedInUser)
+      .then((session) => {
+        !session?.error && createSession(session);
+        reply.status(401).send({
+          ...session,
+        });
+      })
+      .catch((error) => reply.status(401).send(error));
 
     return reply.status(200).send(token);
   } catch (error) {

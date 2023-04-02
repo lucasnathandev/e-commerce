@@ -14,3 +14,5 @@ export const CardSchema = z.object({
   CVC: z.number().min(100).max(999),
   installments: z.number().min(1).max(12).optional(),
 });
+
+export const SlipPaymentSchema = z.object({});

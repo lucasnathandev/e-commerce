@@ -1,3 +1,4 @@
+import { CartId } from "./../models/cart";
 import { UserId } from "./../models/user";
 import { prisma } from "src/lib/prisma";
 import { ControllerType } from "./../lib/types";
@@ -7,8 +8,9 @@ import {
   ProductUserIdSchema,
   UpdateProductSchema,
 } from "src/models/product";
+import { Prisma } from "@prisma/client";
 
-const getProducts: ControllerType = async (request, reply) => {
+const getProducts: ControllerType = async function (request, reply) {
   try {
     const products = await prisma.product.findMany({
       orderBy: {
@@ -22,7 +24,7 @@ const getProducts: ControllerType = async (request, reply) => {
   }
 };
 
-const getProduct: ControllerType = async (request, reply) => {
+const getProduct: ControllerType = async function (request, reply) {
   const { id } = ProductId.parse(request.params);
 
   try {
@@ -37,7 +39,19 @@ const getProduct: ControllerType = async (request, reply) => {
   }
 };
 
-const createProduct: ControllerType = async (request, reply) => {
+const getProductsByFilter: ControllerType = async function (request, reply) {
+  try {
+    const filter: Prisma.ProductFindManyArgs = request?.body?.filter || {};
+
+    const filteredProducts = await prisma.product.findMany(filter);
+
+    return reply.status(200).send(filteredProducts);
+  } catch (error) {
+    reply.send(error);
+  }
+};
+
+const createProduct: ControllerType = async function (request, reply) {
   const { description, price, detailedDescription } = CreateProductSchema.parse(
     request.body
   );
@@ -75,7 +89,7 @@ const createProduct: ControllerType = async (request, reply) => {
   }
 };
 
-const updateProduct: ControllerType = async (request, reply) => {
+const updateProduct: ControllerType = async function (request, reply) {
   const { description, price, detailedDescription } = UpdateProductSchema.parse(
     request.body
   );
@@ -100,7 +114,7 @@ const updateProduct: ControllerType = async (request, reply) => {
   }
 };
 
-const inactivateProduct: ControllerType = async (request, reply) => {
+const inactivateProduct: ControllerType = async function (request, reply) {
   const { id } = ProductId.parse(request.body);
   try {
     await prisma.product.update({
@@ -116,7 +130,7 @@ const inactivateProduct: ControllerType = async (request, reply) => {
   }
 };
 
-const activateProduct: ControllerType = async (request, reply) => {
+const activateProduct: ControllerType = async function (request, reply) {
   const { id } = ProductId.parse(request.body);
   try {
     await prisma.product.update({
@@ -135,6 +149,7 @@ const activateProduct: ControllerType = async (request, reply) => {
 export const productController = {
   getProducts,
   getProduct,
+  getProductsByFilter,
   createProduct,
   updateProduct,
   inactivateProduct,
