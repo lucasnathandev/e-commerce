@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type Address {
+  zipCode     String
+  country     String
+  state       String
+  city        String
+  publicPlace String
+}
+
+type Dimension {
+  height Float
+  width  Float
+  depth  Float
+}
+
+model User {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  user      String       @unique
+  password  String
+  age       Int?
+  email     String       @unique
+  firstName String?
+  lastName  String?
+  rg        String?      @unique
+  cpf       String?      @unique
+  address   Address?
+  type      UserTypeEnum @default(User)
+  products  Product?
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  history   History[]
+  Admin     Admin[]
+  Cart      Cart[]
+  Delivery  Delivery[]
+
+  @@unique([email, user, rg, cpf])
+}
+
+model Admin {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.ObjectId
+}
+
+model Product {
+  id                  String     @id @default(auto()) @map("_id") @db.ObjectId
+  description         String
+  price               Float
+  code                String     @unique
+  owner               User       @relation(fields: [userId], references: [id])
+  detailedDescription String?
+  size                Dimension?
+  userId              String     @unique @db.ObjectId
+  cart                Cart?      @relation(fields: [cartId], references: [id])
+  cartId              String?    @unique @db.ObjectId
+  isActive            Boolean    @default(true)
+  ratingStars         Int        @default(0)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@unique([code, userId, cartId])
+}
+
+model Category {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  subCategory SubCategory[]
+}
+
+model SubCategory {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?   @db.ObjectId
+}
+
+model Cart {
+  id            String            @id @default(auto()) @map("_id") @db.ObjectId
+  products      Product[]
+  discount      Float             @default(0)
+  total         Float             @default(0)
+  paymentMethod PaymentMethodEnum @default(Credit)
+  user          User              @relation(fields: [userId], references: [id])
+  userId        String            @unique @db.ObjectId
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model Order {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  status    OrderStatusEnum @default(Pending)
+  history   History[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  delivery  Delivery[]
+}
+
+model Delivery {
+  id                 String           @id @default(auto()) @map("_id") @db.ObjectId
+  user               User             @relation(fields: [userId], references: [id])
+  userId             String           @db.ObjectId
+  order              Order            @relation(fields: [orderId], references: [id])
+  orderId            String           @db.ObjectId
+  deliveryProvider   DeliveryProvider @relation(fields: [deliveryProviderId], references: [id])
+  deliveryProviderId String           @unique @db.ObjectId
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+}
+
+model DeliveryProvider {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  cnpj       String
+  price      Float
+  deliveries Delivery?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model History {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  action    String
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserTypeEnum {
+  User
+  Seller
+}
+
+enum PaymentMethodEnum {
+  Credit
+  Debit
+  PIX
+  PaymentSlip
+}
+
+enum OrderStatusEnum {
+  Pending
+  Processing
+  Forwarded
+  Completed
+  Cancelled
+  Refunded
+}
