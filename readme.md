@@ -12,7 +12,7 @@
 - [x] Starting to setup database models using Prisma.
 - [x] Starting to create user API.
 - [x] Starting to create product API.
-- [ ] Starting to create cart API.
+- [x] Starting to create cart API.
 - [ ] Starting to create checkout API.
 - [ ] Starting to create delivery API. 
 - [ ] Starting to create payment API.
