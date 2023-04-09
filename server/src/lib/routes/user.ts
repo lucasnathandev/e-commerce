@@ -2,21 +2,25 @@ import { userController } from "./../../controllers/userController";
 import { FastifyInstance } from "fastify";
 
 export const userRoutes = async function (app: FastifyInstance) {
-  const isAdmin = { preValidation: [app.authenticate, app.authorize] };
-  const isAuthenticated = { preValidation: [app.authenticate] };
-  app.get("/user/:id", isAuthenticated, userController.getUser);
-  app.get("/user/list", isAdmin, userController.getUsers);
-  app.post("/user/create", isAdmin, userController.createUser);
-  app.patch("/user/update", isAuthenticated, userController.updateUser);
+  const isAdmin = {
+    preHandler: app.auth([app.authenticate, app.authorize], {
+      relation: "and",
+    }),
+  };
+  const isAuthenticated = {
+    preHandler: app.auth([app.authenticate], {
+      relation: "and",
+    }),
+  };
+  app.get("/:id", isAuthenticated, userController.getUser);
+  app.get("/list", isAdmin, userController.getUsers);
+  app.post("/create", isAdmin, userController.createUser);
+  app.patch("/update", isAuthenticated, userController.updateUser);
   app.patch(
-    "/user/update-password",
+    "/update-password",
     isAuthenticated,
     userController.updateUserPassword
   );
-  app.delete(
-    "/user/inactivate",
-    isAuthenticated,
-    userController.inactivateUser
-  );
-  app.patch("/user/activate", isAdmin, userController.activateUser);
+  app.delete("/inactivate", isAuthenticated, userController.inactivateUser);
+  app.patch("/activate", isAdmin, userController.activateUser);
 };

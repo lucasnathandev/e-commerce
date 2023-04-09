@@ -1,5 +1,3 @@
-import { CartId } from "./../models/cart";
-import { UserId } from "./../models/user";
 import { prisma } from "src/lib/prisma";
 import { ControllerType } from "./../lib/types";
 import {
@@ -26,7 +24,6 @@ const getProducts: ControllerType = async function (request, reply) {
 
 const getProduct: ControllerType = async function (request, reply) {
   const { id } = ProductId.parse(request.params);
-
   try {
     const product = await prisma.product.findFirst({
       where: {
@@ -41,9 +38,11 @@ const getProduct: ControllerType = async function (request, reply) {
 
 const getProductsByFilter: ControllerType = async function (request, reply) {
   try {
-    const filter: Prisma.ProductFindManyArgs = request?.body?.filter || {};
+    const filter: Prisma.ProductWhereInput = request?.body?.filter || {};
 
-    const filteredProducts = await prisma.product.findMany(filter);
+    const filteredProducts = await prisma.product.findMany({
+      where: filter,
+    });
 
     return reply.status(200).send(filteredProducts);
   } catch (error) {

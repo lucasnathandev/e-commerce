@@ -44,8 +44,10 @@ const getCarts: ControllerType = async function (request, reply) {
 
 const getCartsWithFilter: ControllerType = async function (request, reply) {
   try {
-    const filter: Prisma.CartFindManyArgs = request.body?.filter || {};
-    const filteredCarts = await prisma.cart.findMany(filter);
+    const filter: Prisma.ProductWhereInput = request.body?.filter;
+    const filteredCarts = await prisma.cart.findMany({
+      where: filter,
+    });
     return reply.status(200).send(filteredCarts);
   } catch (error) {
     reply.send(error);

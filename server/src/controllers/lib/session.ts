@@ -14,6 +14,13 @@ export const createSession = function (session: ActiveUserSession) {
   activeSessions.push(session);
 };
 
+export const updateSession = function (session: ActiveUserSession) {
+  const activeSessionIndex = activeSessions.findIndex((s) => {
+    s.id === session.id;
+  });
+  activeSessions[activeSessionIndex].lastActive = session.lastActive;
+};
+
 export const checkSession = async function (session: ActiveUserSession) {
   const activeSession = activeSessions.find((s) => {
     s.id === session.id;

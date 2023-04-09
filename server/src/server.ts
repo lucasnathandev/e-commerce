@@ -3,16 +3,16 @@ import fastify, { FastifyError } from "fastify";
 import { FastifyRequest, FastifyReply } from "fastify";
 import helmet from "@fastify/helmet";
 import rateLimit from "@fastify/rate-limit";
-import fastifyAuth from "@fastify/auth";
 import fastifyJwt from "@fastify/jwt";
 import cors from "@fastify/cors";
-import { authenticate } from "./decorators/authenticate";
-import { authorize } from "./decorators/authorize";
 import {
   validatorCompiler,
   serializerCompiler,
 } from "fastify-type-provider-zod";
 import { routes } from "./lib/routes";
+import { authenticate } from "./plugins/authenticate";
+import { authorize } from "./plugins/authorize";
+import { fastifyAuth } from "@fastify/auth";
 
 loadEnv();
 
@@ -66,13 +66,10 @@ server.register(fastifyJwt, {
   },
 });
 
-server.register(fastifyAuth);
-
 // Authentication midddleware
 server.decorate("authenticate", authenticate);
-
-// Authorization middleware
 server.decorate("authorize", authorize);
+server.register(fastifyAuth);
 server.register(routes);
 
 const port: number = Number(process.env.PORT) || 8081;

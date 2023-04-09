@@ -8,12 +8,7 @@ export const authorize = async (
   request: FastifyRequest,
   reply: FastifyReply
 ) => {
-  try {
-    if (request.user.isAdmin) {
-      return true;
-    }
-  } catch (error) {
-    reply.send(error);
+  if (!request.user.isAdmin) {
+    return reply.status(401).send(new Error("Não autorizado."));
   }
-  reply.code(403).send(new Error("Não autorizado"));
 };
